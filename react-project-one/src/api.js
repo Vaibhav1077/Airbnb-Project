@@ -30,4 +30,15 @@ export const createBooking = (listingId, data) =>
 export const getTrips = () => api.get('/trips');
 export const getBookings = () => api.get('/bookings');
 
+// Profile
+export const updateProfile = (formData) =>
+  api.put('/profile', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+// Wishlist
+export const getWishlist = () => api.get('/wishlist');
+export const addToWishlist = (listingId) => api.post(`/wishlist/${listingId}`);
+export const removeFromWishlist = (listingId) => api.delete(`/wishlist/${listingId}`);
+
 export default api;

@@ -12,7 +12,6 @@ const bookingSchema = new mongoose.Schema({
     owneruser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: [true, "Owner user is required"],
     },
     bookinguser: {
         type: mongoose.Schema.Types.ObjectId,
@@ -20,6 +19,7 @@ const bookingSchema = new mongoose.Schema({
         required: [true, "Booking user is required"],
         validate: {
             validator: function(v) {
+                if (!this.owneruser) return true; // no owner means anyone can book
                 return v.toString() !== this.owneruser.toString();
             },
             message: "Booking user cannot be the same as owner user"

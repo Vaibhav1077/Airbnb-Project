@@ -31,13 +31,14 @@ export default function Navbar() {
 
         {user ? (
           <>
+            <Link to="/wishlist" className="nav-link">Wishlist</Link>
             <Link to="/trips" className="nav-link">My Trips</Link>
             <Link to="/bookings" className="nav-link">Host Bookings</Link>
-            <div className="user-menu">
+            <Link to="/profile" className="user-menu">
               <img src={user.profile_pic} alt={user.username} className="user-avatar" />
               <span className="user-name">{user.username}</span>
-              <button onClick={handleLogout} className="btn-logout">Logout</button>
-            </div>
+            </Link>
+            <button onClick={handleLogout} className="btn-logout">Logout</button>
           </>
         ) : (
           <>

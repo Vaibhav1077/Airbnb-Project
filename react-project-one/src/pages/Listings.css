@@ -6,6 +6,7 @@
 }
 
 .listing-card {
+  position: relative;
   text-decoration: none;
   color: inherit;
   border-radius: 12px;
@@ -65,4 +66,34 @@
   padding: 3rem;
   color: var(--text-secondary);
   font-size: 1.1rem;
+}
+
+/* Heart / Wishlist button */
+.heart-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.heart-btn:hover {
+  transform: scale(1.2);
+}
+
+.heart-btn svg {
+  fill: rgba(0, 0, 0, 0.4);
+  stroke: #fff;
+  stroke-width: 2;
+  transition: fill 0.2s;
+}
+
+.heart-btn.hearted svg {
+  fill: #ff385c;
+  stroke: #ff385c;
 }

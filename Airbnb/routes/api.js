@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
+const multer = require('multer');
+const { storage } = require('../cloudconfig.js');
+const upload = multer({ storage });
 const listing = require('../models/schema.js');
 const review = require('../models/review_schema.js');
 const booking = require('../models/bookingSchema.js');
@@ -118,6 +121,72 @@ router.post('/logout', (req, res) => {
         if (err) return res.status(500).json({ error: 'Logout failed' });
         return res.json({ message: 'Logged out successfully' });
     });
+});
+
+// Update profile picture
+router.put('/profile', isLogged, upload.single('profilePic'), async (req, res) => {
+    try {
+        const updates = {};
+        if (req.file) {
+            updates.profile_pic = req.file.path;
+        }
+        const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, { new: true });
+        return res.json({
+            _id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            profile_pic: updatedUser.profile_pic,
+        });
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to update profile' });
+    }
+});
+
+// ===================== WISHLIST =====================
+
+// Get current user's wishlist
+router.get('/wishlist', isLogged, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate('wishlist');
+        res.json(user.wishlist);
+    } catch (err) {
+        console.error('GET /api/wishlist error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch wishlist' });
+    }
+});
+
+// Add listing to wishlist
+router.post('/wishlist/:id', isLogged, async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid listing ID' });
+        }
+        const user = await User.findById(req.user._id);
+        // Prevent duplicates
+        if (user.wishlist.includes(id)) {
+            return res.status(409).json({ error: 'Listing already in wishlist' });
+        }
+        user.wishlist.push(id);
+        await user.save();
+        res.status(201).json({ message: 'Added to wishlist' });
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to add to wishlist' });
+    }
+});
+
+// Remove listing from wishlist
+router.delete('/wishlist/:id', isLogged, async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid listing ID' });
+        }
+        await User.findByIdAndUpdate(req.user._id, { $pull: { wishlist: id } });
+        res.json({ message: 'Removed from wishlist' });
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to remove from wishlist' });
+    }
 });
 
 // ===================== REVIEWS =====================

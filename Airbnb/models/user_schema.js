@@ -22,6 +22,12 @@ const userSchema = mongoose.Schema({
             ref: "booking"
         }
     ],
+    wishlist: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: "listing"
+        }
+    ],
 });
 
 userSchema.plugin(passportLocalMongoose);
