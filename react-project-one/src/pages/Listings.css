@@ -15,7 +15,7 @@
 
 .listing-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-hover);
 }
 
 .listing-img-container {
@@ -40,10 +40,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-primary);
 }
 
 .listing-location {
-  color: #717171;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   margin: 0 0 0.25rem;
 }
@@ -51,6 +52,7 @@
 .listing-price {
   margin: 0;
   font-size: 0.95rem;
+  color: var(--text-primary);
 }
 
 .listing-price span {
@@ -61,6 +63,6 @@
 .no-results {
   text-align: center;
   padding: 3rem;
-  color: #717171;
+  color: var(--text-secondary);
   font-size: 1.1rem;
 }

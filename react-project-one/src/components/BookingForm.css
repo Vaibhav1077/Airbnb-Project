@@ -20,18 +20,22 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
 .booking-field input {
   padding: 0.6rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.9rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .booking-summary {
   padding: 0.75rem 0;
-  border-top: 1px solid #ebebeb;
+  border-top: 1px solid var(--border-light);
+  color: var(--text-primary);
 }
 
 .booking-summary p {

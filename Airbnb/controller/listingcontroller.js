@@ -8,7 +8,6 @@ const geocodingClient = mbxGeocoding({ accessToken:mapToken});
 
 module.exports.index = async (req, res) => {
     let all_listings = await listing.find({});
-    console.log("successfully showing all listings page");
     return res.render('./listings/all_listing.ejs', { all_listings });
 };
 
@@ -23,12 +22,10 @@ module.exports.view_listing = async (req, res) => {
         return res.redirect('/listings');
     }
 
-    console.log("successfully showing single listing page");
     return res.render('./listings/listing.ejs', { list });
 };
 
 module.exports.new_listing_form = async (req, res) => {
-    console.log("successfully showing new listing form");
     return res.render('./listings/new_listing.ejs');
 };
 
@@ -59,7 +56,6 @@ module.exports.add_new_listing = async (req, res) => {
     await newlist.save();
 
     req.flash('success', "New listing created");
-    console.log("successfully added new listing");
     return res.redirect('/listings');
 };
 
@@ -77,7 +73,6 @@ module.exports.edit_listing_form = async (req, res) => {
         '/upload/ar_1.0,h_150,w_250/bo_5px_solid_lightblue'
     );
 
-    console.log("successfully showing edit listing form");
     return res.render('listings/edit_listing.ejs', { list, preview_url });
 };
 
@@ -96,7 +91,6 @@ module.exports.update_listing = async (req, res) => {
     }
 
     req.flash('success', "Listing is Updated");
-    console.log("successfully updated the listing");
     return res.redirect(`/listings/view/${id}`);
 };
 
@@ -114,6 +108,5 @@ module.exports.delete_listing = async (req, res) => {
     await listing.findByIdAndDelete(id);
 
     req.flash('success', "Listing Deleted");
-    console.log("successfully deleted the listing");
     return res.redirect('/listings');
 };

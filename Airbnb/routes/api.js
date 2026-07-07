@@ -1,11 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+const rateLimit = require('express-rate-limit');
 const listing = require('../models/schema.js');
 const review = require('../models/review_schema.js');
 const booking = require('../models/bookingSchema.js');
 const User = require('../models/user_schema.js');
 const passport = require('passport');
 const { isLogged } = require('../middleware.js');
+
+// Rate limiter for auth routes (signup, login)
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // max 10 attempts per window
+    message: { error: 'Too many attempts, please try again after 15 minutes' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 // ===================== LISTINGS =====================
 
@@ -16,12 +27,16 @@ router.get('/listings', async (req, res) => {
         const all_listings = await listing.find(filter).populate('owner').lean();
         res.json(all_listings);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('GET /api/listings error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch listings' });
     }
 });
 
 router.get('/listings/:id', async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid listing ID' });
+        }
         const list = await listing
             .findById(req.params.id)
             .populate({ path: 'reviews', populate: { path: 'author' } })
@@ -31,7 +46,8 @@ router.get('/listings/:id', async (req, res) => {
         }
         return res.json(list);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('GET /api/listings/:id error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch listing' });
     }
 });
 
@@ -51,18 +67,24 @@ router.get('/current-user', (req, res) => {
 });
 
 // Signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', authLimiter, async (req, res) => {
     try {
         const { username, email, password } = req.body;
+        if (!password || password.length < 8) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+        }
         const newUser = new User({ email, username });
         const registeredUser = await User.register(newUser, password);
         req.login(registeredUser, (err) => {
-            if (err) return res.status(500).json({ error: err.message });
-            return res.json({
-                _id: registeredUser._id,
-                username: registeredUser.username,
-                email: registeredUser.email,
-                profile_pic: registeredUser.profile_pic,
+            if (err) return res.status(500).json({ error: 'Login after signup failed' });
+            req.session.save((saveErr) => {
+                if (saveErr) return res.status(500).json({ error: 'Session save failed' });
+                return res.json({
+                    _id: registeredUser._id,
+                    username: registeredUser.username,
+                    email: registeredUser.email,
+                    profile_pic: registeredUser.profile_pic,
+                });
             });
         });
     } catch (err) {
@@ -71,17 +93,20 @@ router.post('/signup', async (req, res) => {
 });
 
 // Login
-router.post('/login', (req, res, next) => {
+router.post('/login', authLimiter, (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) return res.status(500).json({ error: 'Authentication error' });
         if (!user) return res.status(401).json({ error: info?.message || 'Invalid username or password' });
         req.login(user, (err) => {
-            if (err) return res.status(500).json({ error: err.message });
-            return res.json({
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-                profile_pic: user.profile_pic,
+            if (err) return res.status(500).json({ error: 'Login failed' });
+            req.session.save((saveErr) => {
+                if (saveErr) return res.status(500).json({ error: 'Session save failed' });
+                return res.json({
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    profile_pic: user.profile_pic,
+                });
             });
         });
     })(req, res, next);
@@ -90,7 +115,7 @@ router.post('/login', (req, res, next) => {
 // Logout
 router.post('/logout', (req, res) => {
     req.logout((err) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) return res.status(500).json({ error: 'Logout failed' });
         return res.json({ message: 'Logged out successfully' });
     });
 });
@@ -100,6 +125,9 @@ router.post('/logout', (req, res) => {
 // Add a review to a listing
 router.post('/listings/:id/reviews', isLogged, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid listing ID' });
+        }
         const { rating, comment } = req.body;
         const newReview = new review({ rating, comment, author: req.user._id });
         const foundListing = await listing.findById(req.params.id);
@@ -121,6 +149,9 @@ router.post('/listings/:id/reviews', isLogged, async (req, res) => {
 router.delete('/listings/:id/reviews/:reviewId', isLogged, async (req, res) => {
     try {
         const { id, reviewId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(reviewId)) {
+            return res.status(400).json({ error: 'Invalid ID' });
+        }
         const foundReview = await review.findById(reviewId);
         if (!foundReview) return res.status(404).json({ error: 'Review not found' });
 
@@ -133,7 +164,8 @@ router.delete('/listings/:id/reviews/:reviewId', isLogged, async (req, res) => {
         await review.findByIdAndDelete(reviewId);
         res.json({ message: 'Review deleted' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('DELETE review error:', err.message);
+        res.status(500).json({ error: 'Failed to delete review' });
     }
 });
 
@@ -143,6 +175,9 @@ router.delete('/listings/:id/reviews/:reviewId', isLogged, async (req, res) => {
 router.post('/bookings/:id', isLogged, async (req, res) => {
     try {
         const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid listing ID' });
+        }
         const foundListing = await listing.findById(id);
         if (!foundListing) return res.status(404).json({ error: 'Listing not found' });
 
@@ -196,7 +231,8 @@ router.get('/trips', isLogged, async (req, res) => {
         });
         res.json(user.guest_bookings);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('GET /api/trips error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch trips' });
     }
 });
 
@@ -213,7 +249,8 @@ router.get('/bookings', isLogged, async (req, res) => {
         });
         res.json(user.host_bookings);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('GET /api/bookings error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch bookings' });
     }
 });
 

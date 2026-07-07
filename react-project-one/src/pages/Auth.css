@@ -9,15 +9,17 @@
 .auth-card {
   width: 100%;
   max-width: 400px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px var(--shadow);
+  background: var(--bg-card);
 }
 
 .auth-card h2 {
   margin: 0 0 1.5rem;
   text-align: center;
+  color: var(--text-primary);
 }
 
 .auth-card form {
@@ -28,14 +30,16 @@
 
 .auth-card input {
   padding: 0.85rem 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .auth-card input:focus {
   outline: none;
-  border-color: #222;
+  border-color: var(--text-primary);
 }
 
 .auth-card button {
@@ -62,7 +66,7 @@
 .auth-switch {
   text-align: center;
   margin-top: 1rem;
-  color: #717171;
+  color: var(--text-secondary);
 }
 
 .auth-switch a {

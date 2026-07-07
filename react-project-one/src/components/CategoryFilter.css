@@ -3,26 +3,27 @@
   gap: 0.5rem;
   padding: 1rem 2rem;
   overflow-x: auto;
-  border-bottom: 1px solid #ebebeb;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .category-btn {
   white-space: nowrap;
   padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 20px;
-  background: #fff;
+  background: var(--bg-card);
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
 }
 
 .category-btn:hover {
-  border-color: #222;
+  border-color: var(--text-primary);
 }
 
 .category-btn.active {
-  background: #222;
-  color: #fff;
-  border-color: #222;
+  background: var(--category-active-bg);
+  color: var(--category-active-text);
+  border-color: var(--category-active-bg);
 }

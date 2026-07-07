@@ -5,6 +5,7 @@ if(process.env.NODE_ENV!=="production"){
 const express=require('express');
 const app=express();
 const cors=require('cors');
+const helmet=require('helmet');
 const methodOverride=require('method-override');
 const connection=require('./models/connection.js');
 const ejsmate=require('ejs-mate')
@@ -26,9 +27,16 @@ let mongo_url=process.env.mongo_atlas_url;
 const port=Number(process.env.PORT) || 3000;
 connection();
 //all used method are written here
+if(process.env.NODE_ENV === 'production'){
+    app.set('trust proxy', 1);
+}
 app.use(cors({
     origin:process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials:true
+}));
+app.use(helmet({
+    contentSecurityPolicy: false, // disabled to allow EJS views to load external images/scripts
+    crossOriginEmbedderPolicy: false,
 }));
 app.use(express.static('public'));
 app.engine('ejs',ejsmate);
@@ -42,9 +50,6 @@ app.use(express.json());
 
 const store=MongoStore.create({
     mongoUrl:mongo_url,
-    crypto:{
-        secret:process.env.MYSECRET,
-    },
     touchAfter:24*60*60 //in seconds
 });
 store.on("error",(err)=>{
@@ -55,12 +60,12 @@ const sessionOptions={
     store:store,
     secret:process.env.MYSECRET,
     resave:false,
-    saveUninitialized:true,
+    saveUninitialized:false,
     cookie:{
-        // secure: false,
-        expires:Date.now()+7*24*60*60*1000,
         maxAge:7*24*60*60*1000,
-        httponly:true
+        httpOnly:true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     }
 }
 
@@ -101,18 +106,26 @@ app.use('/booking',bookingRouter);
 
 //Rest routes
 app.all('*',(req,res,next)=>{
-    // printing the error and route where it occurred
-    console.log(`failed , page not found at ${req.originalUrl}`);
-    console.log("failed , page not found");
+    // Return JSON for API requests
+    if(req.originalUrl.startsWith('/api')){
+        return res.status(404).json({ error: 'API endpoint not found' });
+    }
     next(new expressError(404,'page not found'));
 })
 
 // handling error by custom middleware
 app.use((err,req,res,next)=>{
+   if(res.headersSent){
+       return next(err);
+   }
    let {statusCode=500,message='Something went wrong'}=err;
+   // Return JSON for API requests
+   if(req.originalUrl.startsWith('/api')){
+       // Only expose message for client errors (4xx), hide details for server errors (5xx)
+       const safeMessage = statusCode < 500 ? message : 'Internal server error';
+       return res.status(statusCode).json({ error: safeMessage });
+   }
    res.render('listings/error.ejs',{message});
-   console.log("failed , some error occurred");
-   console.log(err);
 })
 
 // checking port

@@ -7,10 +7,11 @@
 .detail-header h1 {
   margin: 0 0 0.25rem;
   font-size: 1.6rem;
+  color: var(--text-primary);
 }
 
 .detail-location {
-  color: #717171;
+  color: var(--text-secondary);
   margin: 0 0 1rem;
 }
 
@@ -37,17 +38,19 @@
 
 .detail-host {
   padding-bottom: 1rem;
-  border-bottom: 1px solid #ebebeb;
+  border-bottom: 1px solid var(--border-light);
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .detail-description {
   line-height: 1.6;
-  color: #333;
+  color: var(--text-description);
 }
 
 .detail-category span {
-  background: #f0f0f0;
+  background: var(--detail-category-bg);
+  color: var(--text-primary);
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.85rem;
@@ -56,35 +59,38 @@
 
 /* Price card */
 .price-card {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1.5rem;
   position: sticky;
   top: 100px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px var(--shadow);
+  background: var(--bg-card);
 }
 
 .price-amount {
   font-size: 1.4rem;
   font-weight: 600;
   margin: 0 0 1rem;
+  color: var(--text-primary);
 }
 
 .price-amount span {
   font-size: 1rem;
   font-weight: 400;
-  color: #717171;
+  color: var(--text-secondary);
 }
 
 /* Reviews */
 .reviews-section {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #ebebeb;
+  border-top: 1px solid var(--border-light);
 }
 
 .reviews-section h2 {
   margin: 0 0 1rem;
+  color: var(--text-primary);
 }
 
 .review-form {
@@ -93,7 +99,7 @@
   gap: 0.75rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: #f9f9f9;
+  background: var(--bg-review-form);
   border-radius: 8px;
 }
 
@@ -101,20 +107,25 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: var(--text-primary);
 }
 
 .rating-input select {
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .review-form textarea {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   resize: vertical;
   font-family: inherit;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .review-form button {
@@ -141,14 +152,16 @@
 
 .review-card {
   padding: 1rem;
-  border: 1px solid #ebebeb;
+  border: 1px solid var(--border-light);
   border-radius: 8px;
+  background: var(--bg-card);
 }
 
 .review-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+  color: var(--text-primary);
 }
 
 .review-rating {
@@ -157,13 +170,13 @@
 
 .review-card p {
   margin: 0;
-  color: #333;
+  color: var(--text-description);
 }
 
 .btn-delete-review {
   margin-top: 0.5rem;
   background: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   color: #e0294a;
   padding: 0.25rem 0.6rem;
   border-radius: 4px;

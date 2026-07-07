@@ -6,13 +6,9 @@ module.exports.bookingform=async (req,res)=>{
     let {id}=req.params;
     let newlisting=await listing.findById(id);
     res.render('./bookings/booking_form.ejs',{newlisting});
-    console.log("successfully rendering booking form");
 }
 
 module.exports.addbooking=async (req,res)=>{
-  console.log("entered add booking");
-    //validating the booking form
-    //we can use validation here for this but for now we are not using it , we are using joi validation in the middleware.js file
     let {id}=req.params;
     let newlisting=await listing.findById(id);
     let newbooking=await new booking(req.body);
@@ -42,14 +38,11 @@ module.exports.addbooking=async (req,res)=>{
 
     //redirecting to the listing page
     res.redirect(`/listings/view/${id}`);
-    console.log("successfully added booking");
 }
 
 
 module.exports.showtrips=async (req,res)=>{
     let {id}=req.params;    
-    //finding the user who booked the listing and populating the guest_bookings field
-    //and also populating the bookedlisting and owneruser fields of the booking schema
     let newuser = await User.findById(id).populate({
         path: 'guest_bookings',
         populate: [
@@ -59,15 +52,12 @@ module.exports.showtrips=async (req,res)=>{
         ],
         options: { sort: { bookingAt: -1 } }
       });
-    //rendering the show trips page and passing the user object to it
     res.render('./bookings/show_trips.ejs',{user:newuser});
-    console.log("successfully showing all trips page");
 }
 
 
 module.exports.showbookings=async (req,res)=>{
   let {id}=req.params;
-  //findind the user whose listingis booked and populating the host_bookings field
   let newuser = await User.findById(id).populate({
       path: 'host_bookings',
       populate: [
@@ -78,5 +68,4 @@ module.exports.showbookings=async (req,res)=>{
       options: { sort: { bookingAt: -1 }}
     });
   res.render('./bookings/show_bookings.ejs',{user:newuser});
-  console.log("successfully showing all bookings page");
 }
