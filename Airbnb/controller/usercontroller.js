@@ -5,16 +5,16 @@ module.exports.signup_form=(req,res)=>{
     console.log("successfully showing signup form");
 }
 
-module.exports.signup=async(req,res)=>{
+module.exports.signup=async(req,res,next)=>{
     try {
         let {username,email,password}=req.body;
         let newuser=new User({email,username});
         let registered_user=await User.register(newuser,password);
         req.login(registered_user,(err)=>{
-            if(err)next(err);
+            if(err) return next(err);
             req.flash('success',"Welcome to wanderlust");
-            res.redirect('/listings');
-        })
+            return res.redirect('/listings');
+        });
         console.log("successfully signed up");
     } catch (error) {
         req.flash('success',"This Username already exist ! Please try with other username");
@@ -33,11 +33,11 @@ module.exports.login=async(req,res)=>{
     console.log("successfully logged in");
 }
 
-module.exports.logout=(req,res)=>{
+module.exports.logout=(req,res,next)=>{
     req.logOut((err)=>{
-        if(err)next(err);
+        if(err) return next(err);
         req.flash('success',"You are logged out");
         res.redirect('/listings');
         console.log("successfully logged out");
-    })
+    });
 }

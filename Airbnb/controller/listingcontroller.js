@@ -39,7 +39,12 @@ module.exports.add_new_listing = async (req, res) => {
         limit: 1
     }).send();
 
+    if (!result.body.features || result.body.features.length === 0) {
+        throw new expressError(400, 'Could not find coordinates for that location. Try a more specific address.');
+    }
+
     let newlist = new listing(req.body.list);
+    newlist.image = [];
 
     if (req.files && req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {

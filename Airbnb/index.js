@@ -1,9 +1,10 @@
-if(process.env.NODE_EVN!=="production"){
+if(process.env.NODE_ENV!=="production"){
     require("dotenv").config();
 }
 
 const express=require('express');
 const app=express();
+const cors=require('cors');
 const methodOverride=require('method-override');
 const connection=require('./models/connection.js');
 const ejsmate=require('ejs-mate')
@@ -18,13 +19,17 @@ const flash=require('connect-flash');
 const passport = require('passport');
 const LocalStrategy=require('passport-local');
 const User=require('./models/user_schema.js');
-const { mongo } = require("mongoose");
+const apiRouter=require('./routes/api.js');
+
 let mongo_url=process.env.mongo_atlas_url;
 
-
-const port=3000;
+const port=Number(process.env.PORT) || 3000;
 connection();
 //all used method are written here
+app.use(cors({
+    origin:process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials:true
+}));
 app.use(express.static('public'));
 app.engine('ejs',ejsmate);
 app.set('view engine','ejs');
@@ -42,9 +47,9 @@ const store=MongoStore.create({
     },
     touchAfter:24*60*60 //in seconds
 });
-store.on("error",()=>{
+store.on("error",(err)=>{
     console.log("Error in mongo session store ",err);
-})
+});
 
 const sessionOptions={
     store:store,
@@ -72,8 +77,13 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req,res,next)=>{
     res.locals.success=req.flash('success');
     res.locals.error=req.flash('error');
-    res.locals.currUser=req.user;
+    res.locals.currUser=req.user || null;
     next();
+})
+
+//health check endpoint
+app.get('/health',(req,res)=>{
+    res.json({ status:'ok', uptime:process.uptime() });
 })
 
 //root route
@@ -82,6 +92,7 @@ app.get('/',(req,res)=>{
 })
 
 //routes
+app.use('/api',apiRouter);
 app.use('/listings',listingRouter);
 app.use('/listings/:id/review',reviewRouter);
 app.use('/',userRouter);
@@ -106,5 +117,5 @@ app.use((err,req,res,next)=>{
 
 // checking port
 app.listen(port,()=>{
-    console.log("app is listening");
-})
+    console.log(`app is listening on port ${port}`);
+});

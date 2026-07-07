@@ -48,9 +48,13 @@ module.exports.bookingvalidation = (req, res, next) => {
 
 module.exports.isLogged=(req,res,next)=>{
     if(!req.isAuthenticated()){
+        // Return JSON for API requests
+        if(req.originalUrl.startsWith('/api')){
+            return res.status(401).json({ error: 'You must be logged in' });
+        }
         req.session.redirectUrl=req.originalUrl;
         req.flash('success',"Please Login");
-        res.redirect('/login');
+        return res.redirect('/login');
     }
     next();
 }

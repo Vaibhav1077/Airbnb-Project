@@ -1,0 +1,28 @@
+.category-filter {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  overflow-x: auto;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.category-btn {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.category-btn:hover {
+  border-color: #222;
+}
+
+.category-btn.active {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}

@@ -1,11 +1,13 @@
 {
   "engines": {
-    "node": "v22.13.0"
+    "node": ">=18.0.0"
   },
   "name": "airbnb",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,6 +19,7 @@
     "cloudinary": "^2.6.0",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^5.1.0",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "ejs-mate": "^4.0.0",
@@ -35,11 +38,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GOVINDJANGID3011/Airbnb.git"
+    "url": "git+https://github.com/Vaibhav1077/Airbnb-Project.git"
   },
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/GOVINDJANGID3011/Airbnb/issues"
+    "url": "https://github.com/Vaibhav1077/Airbnb-Project/issues"
   },
-  "homepage": "https://github.com/GOVINDJANGID3011/Airbnb#readme"
+  "homepage": "https://github.com/Vaibhav1077/Airbnb-Project#readme"
 }
